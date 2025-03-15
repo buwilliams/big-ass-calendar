@@ -6,7 +6,24 @@
     <title>{{ app_title }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Load local Alpine.js first with fallback to CDN -->
+    <script defer src="{{ url_for('static', filename='js/vendor/alpine.min.js') }}"></script>
+    <script>
+        // Check if Alpine loaded correctly from local file
+        window.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                if (!window.Alpine || typeof window.Alpine.start !== 'function') {
+                    console.warn('Local Alpine.js failed to load properly, using CDN fallback');
+                    const fallbackScript = document.createElement('script');
+                    fallbackScript.defer = true;
+                    fallbackScript.src = 'https://unpkg.com/alpinejs@3.13.3/dist/cdn.min.js';
+                    document.head.appendChild(fallbackScript);
+                } else {
+                    console.info('Using local Alpine.js');
+                }
+            }, 100); // Short delay to allow local script to initialize
+        });
+    </script>
 </head>
 <body>
     <div x-data="calendar({{ default_year }})" class="calendar-app">

@@ -77,6 +77,17 @@ log_success "Dependencies installed"
 check_and_create_config "$CONFIG_FILE" "config_sample.yaml" "Configuration" || exit 1
 check_and_create_config "$GOOGLE_CLIENT_FILE" "google_client_sample.json" "Google client" || exit 1
 
+# Check if we have a full Alpine.js library or just the placeholder
+if [ -s "app/static/js/vendor/alpine.min.js" ]; then
+    file_size=$(wc -c < "app/static/js/vendor/alpine.min.js")
+    if [ "$file_size" -lt 5000 ]; then
+        log_warning "Using simplified Alpine.js placeholder. For production use, download the full library:"
+        log_info "curl -o app/static/js/vendor/alpine.min.js https://unpkg.com/alpinejs@3.13.3/dist/cdn.min.js"
+    else
+        log_info "Using full Alpine.js library"
+    fi
+fi
+
 # Run the application
 log_info "Starting Big Ass Calendar application..."
 python run.py --config="$CONFIG_FILE" --google-client="$GOOGLE_CLIENT_FILE"
