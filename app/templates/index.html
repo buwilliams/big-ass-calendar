@@ -18,9 +18,7 @@
                     fallbackScript.defer = true;
                     fallbackScript.src = 'https://unpkg.com/alpinejs@3.13.3/dist/cdn.min.js';
                     document.head.appendChild(fallbackScript);
-                } else {
-                    console.info('Using local Alpine.js');
-                }
+                } // else: local Alpine.js loaded successfully
             }, 100); // Short delay to allow local script to initialize
         });
     </script>
