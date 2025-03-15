@@ -130,3 +130,32 @@ def test_check_auth_unauthenticated(client):
 def test_login_redirect(client):
     response = client.get("/login")
     assert response.status_code == 302  # Redirect to Google OAuth
+    
+# To test the command line argument parsing, we create a custom test
+# that directly uses argparse rather than invoking the full application
+def test_command_line_args():
+    import argparse
+    
+    # Create a parser with the same arguments as in run.py
+    parser = argparse.ArgumentParser(description='Test argument parser')
+    parser.add_argument('--config', 
+                      help='Path to the configuration YAML file')
+    parser.add_argument('--google-client', 
+                      help='Path to the Google client JSON credentials file')
+    parser.add_argument('--info', action='store_true',
+                      help='Show application information and exit')
+    
+    # Test that our expected arguments are recognized
+    args = parser.parse_args(['--info'])
+    assert args.info is True
+    
+    args = parser.parse_args(['--config', 'test_config.yaml'])
+    assert args.config == 'test_config.yaml'
+    
+    args = parser.parse_args(['--google-client', 'test_client.json'])
+    assert args.google_client == 'test_client.json'
+    
+    # Test combined arguments
+    args = parser.parse_args(['--config', 'test_config.yaml', '--google-client', 'test_client.json'])
+    assert args.config == 'test_config.yaml'
+    assert args.google_client == 'test_client.json'

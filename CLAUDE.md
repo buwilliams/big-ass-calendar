@@ -5,6 +5,8 @@
 - Config: `cp config_sample.yaml config.yaml && nano config.yaml`
 - Google credentials: `cp google_client_sample.json google_client.json && nano google_client.json`
 - Run dev server: `python run.py`
+- Show detailed usage info: `python run.py --info`
+- Show command-line options: `python run.py --help`
 - Run with custom config: `python run.py --config=path/to/config.yaml`
 - Run with custom Google client: `python run.py --google-client=path/to/credentials.json`
 - Run with both: `python run.py --config=path/to/config.yaml --google-client=path/to/credentials.json`
