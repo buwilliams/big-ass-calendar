@@ -36,6 +36,12 @@ class CalendarCanvas {
         
         // Recalculate cell dimensions
         this.calculateDimensions();
+        
+        // Return the canvas dimensions for potential use in fitting logic
+        return {
+            width: rect.width,
+            height: rect.height
+        };
     }
     
     calculateDimensions() {

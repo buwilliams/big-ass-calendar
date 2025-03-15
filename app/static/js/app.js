@@ -20,6 +20,26 @@ document.addEventListener('alpine:init', () => {
                 await this.fetchCalendars();
                 await this.fetchEvents();
             }
+            
+            // Add window resize event listener
+            window.addEventListener('resize', this.debounce(() => {
+                // Auto-fit when window is resized
+                if (this.autoResize) {
+                    this.fitCalendarToView();
+                }
+            }, 250));
+            
+            // Initialize with auto-resize enabled
+            this.autoResize = true;
+        },
+        
+        // Debounce helper function for resize events
+        debounce(func, wait) {
+            let timeout;
+            return (...args) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
         },
         
         async fetchAppConfig() {
@@ -141,6 +161,59 @@ document.addEventListener('alpine:init', () => {
                 this.calendarCanvas.resize();
                 this.drawCalendar();
             });
+            
+            // Initial fit to view
+            this.$nextTick(() => {
+                this.fitCalendarToView();
+            });
+        },
+        
+        fitCalendarToView() {
+            if (!this.calendarCanvas) return;
+            
+            // Get the container dimensions
+            const container = this.$refs.canvas.parentElement;
+            const containerWidth = container.clientWidth;
+            const containerHeight = container.clientHeight;
+            
+            // Get the calendar dimensions (before any scaling or translation)
+            const calendarWidth = 32 * this.calendarCanvas.columnWidth; // 31 days + 1 for month labels
+            const calendarHeight = 13 * this.calendarCanvas.rowHeight; // 12 months + 1 for day labels
+            
+            // Calculate the scale needed to fit
+            const widthScale = containerWidth / calendarWidth;
+            const heightScale = containerHeight / calendarHeight;
+            
+            // Use the smaller scale to ensure the entire calendar fits
+            let scale = Math.min(widthScale, heightScale) * 0.95; // 5% padding
+            
+            // Ensure scale is within reasonable bounds
+            scale = Math.max(0.5, Math.min(scale, 1.5));
+            
+            // Reset translation and set the new scale
+            this.calendarCanvas.translateX = (containerWidth - (calendarWidth * scale)) / 2;
+            this.calendarCanvas.translateY = (containerHeight - (calendarHeight * scale)) / 2;
+            this.calendarCanvas.scale = scale;
+            
+            // Redraw with new transform
+            this.drawCalendar();
+            
+            // Provide visual feedback
+            this.showResizeFeedback();
+        },
+        
+        showResizeFeedback() {
+            // Find the resize button
+            const resizeBtn = document.querySelector('.highlight-btn');
+            if (!resizeBtn) return;
+            
+            // Add a temporary class for visual feedback
+            resizeBtn.classList.add('btn-flash');
+            
+            // Remove the class after animation completes
+            setTimeout(() => {
+                resizeBtn.classList.remove('btn-flash');
+            }, 500);
         },
         
         drawCalendar() {

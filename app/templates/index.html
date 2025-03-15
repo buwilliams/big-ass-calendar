@@ -46,6 +46,8 @@
             </div>
             
             <div class="user-controls">
+                <button @click="fitCalendarToView" class="control-btn highlight-btn">Resize</button>
+                
                 <template x-if="isAuthenticated">
                     <div class="authenticated-controls">
                         <button @click="toggleCalendarList" class="control-btn">Calendars</button>
