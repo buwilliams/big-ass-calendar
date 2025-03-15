@@ -15,6 +15,11 @@ def index():
         app_title=current_app.config.get("APP_TITLE", "The Big A$$ Calendar"),
         default_year=current_app.config.get("DEFAULT_YEAR", datetime.now().year)
     )
+    
+@calendar_bp.route('/favicon.ico')
+def favicon():
+    """Serve the favicon from the root path"""
+    return current_app.send_static_file('img/favicon.ico')
 
 @calendar_bp.route("/api/config")
 def get_app_config():
