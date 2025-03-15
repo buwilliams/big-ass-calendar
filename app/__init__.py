@@ -3,6 +3,10 @@ from flask_cors import CORS
 import os
 from app.config import load_config, load_google_client
 
+# Allow OAuth to work in development environment
+if os.environ.get('FLASK_ENV') == 'development' or os.environ.get('DEBUG'):
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
 def create_app(config_path=None, google_client_path=None):
     """
     Create and configure the Flask application

@@ -89,17 +89,35 @@ python run.py --info
 
 ## Google API Setup
 
+### Setting up Google OAuth 2.0
+
 1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a new project
-3. Enable the Google Calendar API
-4. Create OAuth 2.0 credentials (Web application type)
-5. Add authorized redirect URIs:
-   - `http://localhost:5000/oauth2callback` (for development)
-   - Your production callback URL when deployed
-6. Download the client credentials JSON file by clicking the "Download JSON" button
-7. Save the file as `google_client.json` in the project root directory
+3. Navigate to "APIs & Services" > "Library"
+4. Enable the Google Calendar API
+5. Go to "OAuth consent screen" and configure:
+   - User Type: External
+   - App name: "Big Ass Calendar" 
+   - User support email: Your email
+   - Developer contact information: Your email
+   - Authorized domains: Add your domain if deploying to production
+6. Go to "Credentials" and create OAuth 2.0 credentials:
+   - Application type: Web application
+   - Name: "Big Ass Calendar"
+   - Authorized JavaScript origins:
+     - `http://localhost:5000`
+     - `http://127.0.0.1:5000`
+   - Authorized redirect URIs:
+     - `http://localhost:5000/oauth2callback`
+     - `http://127.0.0.1:5000/oauth2callback`
+     - Your production callback URL when deployed
 
-Alternatively, you can add the credentials to your `config.yaml` file:
+7. Download the client credentials JSON file by clicking the "Download JSON" button
+8. Save the file as `google_client.json` in the project root directory
+
+### Alternative Configuration Method
+
+You can add the credentials to your `config.yaml` file:
 
 ```yaml
 google:
@@ -108,6 +126,15 @@ google:
 ```
 
 The application will prefer the `google_client.json` file if it exists.
+
+### Troubleshooting OAuth
+
+If you encounter OAuth issues:
+
+1. Access the debug endpoint: `http://localhost:5000/debug-oauth`
+2. Check that the redirect URI in your Google Cloud Console exactly matches the one shown in the debug endpoint
+3. Ensure OAUTHLIB_INSECURE_TRANSPORT=1 is set (automatic in development mode)
+4. Verify that your credentials haven't expired (check Google Cloud Console)
 
 ## Usage
 

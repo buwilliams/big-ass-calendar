@@ -1,7 +1,14 @@
 import os
 import sys
+import logging
 from app import create_app
 import argparse
+
+# Configure logging for OAuth debugging
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # Allow OAuth over HTTP for development
+logging.basicConfig(level=logging.INFO)
+logging.getLogger('oauthlib').setLevel(logging.DEBUG)
+logging.getLogger('google.auth.transport.requests').setLevel(logging.DEBUG)
 
 def print_app_info():
     """Print information about the Big Ass Calendar application"""
