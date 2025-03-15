@@ -267,26 +267,85 @@ document.addEventListener('alpine:init', () => {
         formatEventTime(event) {
             if (!event.start) return '';
             
-            // All-day event
-            if (event.start.date) {
-                return 'All day';
-            }
-            
-            // Timed event
-            if (event.start.dateTime) {
-                const start = new Date(event.start.dateTime);
-                let end = '';
+            // Handle multi-day events
+            if (event.isMultiDay) {
+                let eventTime = '';
                 
-                if (event.end && event.end.dateTime) {
-                    end = new Date(event.end.dateTime);
+                // All-day event
+                if (event.start.date) {
+                    // Parse the dates
+                    const startDate = new Date(event.start.date);
+                    let endDate;
+                    
+                    if (event.end && event.end.date) {
+                        // Google Calendar stores end date as the day AFTER the last day
+                        // Subtract one day to get the actual end date
+                        endDate = new Date(event.end.date);
+                        endDate.setDate(endDate.getDate() - 1);
+                    } else {
+                        endDate = startDate;
+                    }
+                    
+                    // Format options
+                    const dateOptions = { month: 'short', day: 'numeric' };
+                    
+                    if (event.isFirstDay) {
+                        // This is the first day of the event
+                        eventTime = `Multi-day: ${startDate.toLocaleDateString(undefined, dateOptions)} - ${endDate.toLocaleDateString(undefined, dateOptions)}`;
+                    } else {
+                        // Continuation of a multi-day event
+                        eventTime = `Continues from ${startDate.toLocaleDateString(undefined, dateOptions)}`;
+                    }
+                    
+                    return eventTime;
+                } 
+                
+                // Timed multi-day event
+                if (event.start.dateTime) {
+                    const startDate = new Date(event.start.dateTime);
+                    let endDate;
+                    
+                    if (event.end && event.end.dateTime) {
+                        endDate = new Date(event.end.dateTime);
+                    } else {
+                        endDate = startDate;
+                    }
+                    
+                    // Format options
+                    const dateOptions = { month: 'short', day: 'numeric' };
+                    const timeOptions = { hour: 'numeric', minute: '2-digit' };
+                    
+                    if (event.isFirstDay) {
+                        // First day: show start time and date range
+                        return `Starts: ${startDate.toLocaleTimeString(undefined, timeOptions)}, ${startDate.toLocaleDateString(undefined, dateOptions)} - ${endDate.toLocaleDateString(undefined, dateOptions)}`;
+                    } else {
+                        // Continuing days
+                        return `Continues from ${startDate.toLocaleDateString(undefined, dateOptions)}`;
+                    }
+                }
+            } else {
+                // Regular single-day event
+                // All-day event
+                if (event.start.date) {
+                    return 'All day';
                 }
                 
-                const timeOptions = { hour: 'numeric', minute: '2-digit' };
-                
-                if (end) {
-                    return `${start.toLocaleTimeString(undefined, timeOptions)} - ${end.toLocaleTimeString(undefined, timeOptions)}`;
-                } else {
-                    return start.toLocaleTimeString(undefined, timeOptions);
+                // Timed event
+                if (event.start.dateTime) {
+                    const start = new Date(event.start.dateTime);
+                    let end = '';
+                    
+                    if (event.end && event.end.dateTime) {
+                        end = new Date(event.end.dateTime);
+                    }
+                    
+                    const timeOptions = { hour: 'numeric', minute: '2-digit' };
+                    
+                    if (end) {
+                        return `${start.toLocaleTimeString(undefined, timeOptions)} - ${end.toLocaleTimeString(undefined, timeOptions)}`;
+                    } else {
+                        return start.toLocaleTimeString(undefined, timeOptions);
+                    }
                 }
             }
             

@@ -226,10 +226,20 @@ class CalendarCanvas {
     }
     
     drawEventIndicator(x, y, events) {
-        // Sort events by calendar
+        // Sort events by calendar and categorize single-day vs multi-day events
         const eventsByCalendar = {};
+        const multiDayEvents = [];
+        const singleDayEvents = [];
         
         events.forEach(event => {
+            // Categorize events as single-day or multi-day
+            if (event.isMultiDay) {
+                multiDayEvents.push(event);
+            } else {
+                singleDayEvents.push(event);
+            }
+            
+            // Group by calendar for visualization
             if (!eventsByCalendar[event.calendarId]) {
                 eventsByCalendar[event.calendarId] = [];
             }
@@ -248,10 +258,14 @@ class CalendarCanvas {
         const cellCenterX = x + (this.columnWidth / 2);
         const cellCenterY = y + (this.rowHeight * 0.6); // Move down to make room for header
         
+        // Draw unique single-day and multi-day event counts
+        const singleDayCount = this.countUniqueEvents(singleDayEvents);
+        const multiDayCount = this.countUniqueEvents(multiDayEvents);
+        const totalCount = singleDayCount + multiDayCount;
+        
         if (Object.keys(eventsByCalendar).length === 1) {
             // Single calendar: draw one colored circle
             const calendarId = Object.keys(eventsByCalendar)[0];
-            const count = eventsByCalendar[calendarId].length;
             
             this.ctx.fillStyle = calendarColors[calendarId];
             this.ctx.beginPath();
@@ -259,21 +273,30 @@ class CalendarCanvas {
             this.ctx.fill();
             
             // Add count text if there are multiple events
-            if (count > 1) {
+            if (totalCount > 1) {
                 this.ctx.fillStyle = 'white';
                 this.ctx.font = '10px Arial';
                 this.ctx.textAlign = 'center';
                 this.ctx.textBaseline = 'middle';
-                this.ctx.fillText(count.toString(), cellCenterX, cellCenterY);
+                this.ctx.fillText(totalCount.toString(), cellCenterX, cellCenterY);
+            }
+            
+            // Add a border for multi-day events
+            if (multiDayCount > 0) {
+                this.ctx.strokeStyle = 'white';
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                this.ctx.arc(cellCenterX, cellCenterY, indicatorSize / 2 + 2, 0, Math.PI * 2);
+                this.ctx.stroke();
             }
         } else {
             // Multiple calendars: draw pie segments
             const calendarIds = Object.keys(eventsByCalendar);
-            const totalEvents = calendarIds.reduce((sum, id) => sum + eventsByCalendar[id].length, 0);
+            const totalEvents = calendarIds.reduce((sum, id) => sum + this.countUniqueEvents(eventsByCalendar[id]), 0);
             
             let startAngle = 0;
             calendarIds.forEach(calendarId => {
-                const count = eventsByCalendar[calendarId].length;
+                const count = this.countUniqueEvents(eventsByCalendar[calendarId]);
                 const angle = (count / totalEvents) * (Math.PI * 2);
                 
                 this.ctx.fillStyle = calendarColors[calendarId];
@@ -287,7 +310,7 @@ class CalendarCanvas {
             });
             
             // Add total count text
-            if (totalEvents > 1) {
+            if (totalCount > 1) {
                 this.ctx.fillStyle = 'white';
                 this.ctx.beginPath();
                 this.ctx.arc(cellCenterX, cellCenterY, indicatorSize / 4, 0, Math.PI * 2);
@@ -297,9 +320,35 @@ class CalendarCanvas {
                 this.ctx.font = '10px Arial';
                 this.ctx.textAlign = 'center';
                 this.ctx.textBaseline = 'middle';
-                this.ctx.fillText(totalEvents.toString(), cellCenterX, cellCenterY);
+                this.ctx.fillText(totalCount.toString(), cellCenterX, cellCenterY);
+            }
+            
+            // Add a border for multi-day events
+            if (multiDayCount > 0) {
+                this.ctx.strokeStyle = 'white';
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                this.ctx.arc(cellCenterX, cellCenterY, indicatorSize / 2 + 2, 0, Math.PI * 2);
+                this.ctx.stroke();
             }
         }
+    }
+    
+    // Helper method to count unique events (preventing double-counting of multi-day events)
+    countUniqueEvents(events) {
+        // For multi-day events, only count an event once per day, giving priority to the first day
+        const countedEventIds = new Set();
+        let count = 0;
+        
+        events.forEach(event => {
+            // If the event is not a multi-day event or it's the first day of a multi-day event, count it
+            if (!event.isMultiDay || event.isFirstDay || !countedEventIds.has(event.id)) {
+                count++;
+                countedEventIds.add(event.id);
+            }
+        });
+        
+        return count;
     }
     
     handleClick(e) {

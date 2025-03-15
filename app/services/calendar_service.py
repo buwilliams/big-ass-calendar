@@ -49,24 +49,59 @@ def get_events_for_year(credentials, year, calendar_ids):
     
     for event in all_events:
         start = event.get("start", {})
+        end = event.get("end", {})
         
         # Handle all-day events
         if "date" in start:
-            event_date = start["date"]
-        else:
-            # Convert datetime to date string
-            event_datetime = start.get("dateTime", "")
-            if event_datetime:
-                dt = datetime.fromisoformat(event_datetime.replace("Z", "+00:00"))
-                event_date = dt.strftime("%Y-%m-%d")
+            start_date = datetime.fromisoformat(start["date"])
+            
+            # For end date, subtract 1 day if using Google Calendar convention
+            # Google stores end date as the day after the actual end
+            if "date" in end:
+                end_date = datetime.fromisoformat(end["date"]) - timedelta(days=1)
             else:
+                end_date = start_date  # Single day event
+                
+        else:
+            # Timed events
+            event_datetime = start.get("dateTime", "")
+            if not event_datetime:
                 continue  # Skip events with no date
+                
+            start_date = datetime.fromisoformat(event_datetime.replace("Z", "+00:00"))
+            
+            # Get end date/time if available
+            end_datetime = end.get("dateTime", "")
+            if end_datetime:
+                end_date = datetime.fromisoformat(end_datetime.replace("Z", "+00:00"))
+            else:
+                end_date = start_date  # Use start date if no end date
         
-        # Add event to the appropriate date
-        if event_date not in events_by_date:
-            events_by_date[event_date] = []
+        # Generate all dates between start and end (inclusive)
+        current_date = start_date.date()
+        end_date = end_date.date()
         
-        events_by_date[event_date].append(event)
+        # For each day in the event's duration
+        while current_date <= end_date:
+            event_date = current_date.isoformat()
+            
+            # Add event to the appropriate date
+            if event_date not in events_by_date:
+                events_by_date[event_date] = []
+            
+            # Clone the event for each day to avoid modifying the original
+            event_copy = event.copy()
+            
+            # Add a flag to indicate if this is the first day of a multi-day event
+            event_copy["isFirstDay"] = (current_date == start_date.date())
+            
+            # Add a flag to indicate this is a multi-day event
+            event_copy["isMultiDay"] = (start_date.date() != end_date)
+            
+            events_by_date[event_date].append(event_copy)
+            
+            # Move to the next day
+            current_date += timedelta(days=1)
     
     return events_by_date
 

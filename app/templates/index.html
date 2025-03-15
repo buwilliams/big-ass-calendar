@@ -109,7 +109,9 @@
                     </template>
                     
                     <template x-for="event in selectedDayEvents" :key="event.id">
-                        <div class="event-item" :style="{ borderLeftColor: getEventColor(event) }">
+                        <div class="event-item" 
+                             :class="{ 'multi-day': event.isMultiDay, 'multi-day-first': event.isFirstDay }"
+                             :style="{ borderLeftColor: getEventColor(event) }">
                             <div class="event-header">
                                 <h3 x-text="event.summary"></h3>
                                 <span x-text="formatEventTime(event)"></span>

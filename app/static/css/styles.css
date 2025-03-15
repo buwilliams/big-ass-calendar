@@ -179,6 +179,20 @@ body {
     border-left: 4px solid #4285F4;
 }
 
+/* Style for multi-day events */
+.event-item.multi-day {
+    border-style: solid;
+    border-width: 1px 1px 1px 4px;
+    border-color: #ddd #ddd #ddd #4285F4;
+    background-color: #fafafa;
+}
+
+/* Style for the first day of a multi-day event */
+.event-item.multi-day-first {
+    border-top-width: 2px;
+    border-top-color: #4285F4;
+}
+
 .event-header {
     display: flex;
     justify-content: space-between;
