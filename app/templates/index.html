@@ -5,7 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ app_title }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    
+    <!-- Favicon and App Icons -->
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/logo/favicon.svg') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='img/logo/logo-192.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='img/logo/apple-touch-icon.png') }}">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#4285F4">
+    <meta name="application-name" content="{{ app_title }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <!-- Load local Alpine.js first with fallback to CDN -->
     <script defer src="{{ url_for('static', filename='js/vendor/alpine.min.js') }}"></script>
     <script>
@@ -28,7 +38,10 @@
         <header class="app-header">
             <div class="header-controls">
                 <button @click="prevYear" class="control-btn" aria-label="Previous Year">&lt;</button>
-                <h1 class="app-title">{{ app_title }} <span x-text="currentYear"></span></h1>
+                <h1 class="app-title">
+                    <img src="{{ url_for('static', filename='img/logo/favicon.svg') }}" alt="Logo" class="logo">
+                    {{ app_title }} <span x-text="currentYear"></span>
+                </h1>
                 <button @click="nextYear" class="control-btn" aria-label="Next Year">&gt;</button>
             </div>
             

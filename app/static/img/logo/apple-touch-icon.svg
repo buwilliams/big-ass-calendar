@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <!-- Background -->
+  <rect width="180" height="180" rx="45" ry="45" fill="#4285F4" />
+  
+  <!-- Calendar Base -->
+  <rect x="36" y="36" width="108" height="108" rx="6" ry="6" fill="white" />
+  
+  <!-- Calendar Header -->
+  <rect x="36" y="36" width="108" height="22" rx="6" ry="6" fill="#EA4335" />
+  
+  <!-- Calendar Grid Lines -->
+  <line x1="36" y1="79" x2="144" y2="79" stroke="#E0E0E0" stroke-width="1.5" />
+  <line x1="36" y1="101" x2="144" y2="101" stroke="#E0E0E0" stroke-width="1.5" />
+  <line x1="36" y1="122" x2="144" y2="122" stroke="#E0E0E0" stroke-width="1.5" />
+  
+  <line x1="54" y1="58" x2="54" y2="144" stroke="#E0E0E0" stroke-width="1.5" />
+  <line x1="72" y1="58" x2="72" y2="144" stroke="#E0E0E0" stroke-width="1.5" />
+  <line x1="90" y1="58" x2="90" y2="144" stroke="#E0E0E0" stroke-width="1.5" />
+  <line x1="108" y1="58" x2="108" y2="144" stroke="#E0E0E0" stroke-width="1.5" />
+  <line x1="126" y1="58" x2="126" y2="144" stroke="#E0E0E0" stroke-width="1.5" />
+  
+  <!-- Calendar Days (Highlighted Events) -->
+  <rect x="111" y="83" width="12" height="14" rx="2" ry="2" fill="#FBBC05" />
+  <rect x="58" y="105" width="12" height="14" rx="2" ry="2" fill="#34A853" />
+  <rect x="76" y="126" width="12" height="14" rx="2" ry="2" fill="#EA4335" />
+</svg>

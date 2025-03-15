@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <!-- Background -->
+  <rect width="500" height="500" rx="50" ry="50" fill="#4285F4" />
+  
+  <!-- Calendar Base -->
+  <rect x="100" y="100" width="300" height="300" rx="20" ry="20" fill="white" />
+  
+  <!-- Calendar Header -->
+  <rect x="100" y="100" width="300" height="60" rx="20" ry="20" fill="#EA4335" />
+  
+  <!-- Calendar Grid Lines -->
+  <line x1="100" y1="220" x2="400" y2="220" stroke="#E0E0E0" stroke-width="4" />
+  <line x1="100" y1="280" x2="400" y2="280" stroke="#E0E0E0" stroke-width="4" />
+  <line x1="100" y1="340" x2="400" y2="340" stroke="#E0E0E0" stroke-width="4" />
+  
+  <line x1="150" y1="160" x2="150" y2="400" stroke="#E0E0E0" stroke-width="4" />
+  <line x1="200" y1="160" x2="200" y2="400" stroke="#E0E0E0" stroke-width="4" />
+  <line x1="250" y1="160" x2="250" y2="400" stroke="#E0E0E0" stroke-width="4" />
+  <line x1="300" y1="160" x2="300" y2="400" stroke="#E0E0E0" stroke-width="4" />
+  <line x1="350" y1="160" x2="350" y2="400" stroke="#E0E0E0" stroke-width="4" />
+  
+  <!-- Calendar Days (Highlighted Events) -->
+  <rect x="310" y="230" width="30" height="40" rx="5" ry="5" fill="#FBBC05" />
+  <rect x="160" y="290" width="30" height="40" rx="5" ry="5" fill="#34A853" />
+  <rect x="210" y="350" width="30" height="40" rx="5" ry="5" fill="#EA4335" />
+  
+  <!-- Calendar Month Indicators -->
+  <text x="125" y="190" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">J</text>
+  <text x="125" y="250" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">F</text>
+  <text x="125" y="310" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">M</text>
+  <text x="125" y="370" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">A</text>
+  
+  <!-- Calendar Day Numbers -->
+  <text x="175" y="180" font-family="Arial, sans-serif" font-size="12" fill="#333">1</text>
+  <text x="225" y="180" font-family="Arial, sans-serif" font-size="12" fill="#333">2</text>
+  <text x="275" y="180" font-family="Arial, sans-serif" font-size="12" fill="#333">3</text>
+  <text x="325" y="180" font-family="Arial, sans-serif" font-size="12" fill="#333">4</text>
+  <text x="375" y="180" font-family="Arial, sans-serif" font-size="12" fill="#333">5</text>
+</svg>
