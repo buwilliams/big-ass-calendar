@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ app_title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body>
+    <div x-data="calendar({{ default_year }})" class="calendar-app">
+        <header class="app-header">
+            <div class="header-controls">
+                <button @click="prevYear" class="control-btn" aria-label="Previous Year">&lt;</button>
+                <h1 class="app-title">{{ app_title }} <span x-text="currentYear"></span></h1>
+                <button @click="nextYear" class="control-btn" aria-label="Next Year">&gt;</button>
+            </div>
+            
+            <div class="user-controls">
+                <template x-if="isAuthenticated">
+                    <div class="authenticated-controls">
+                        <button @click="toggleCalendarList" class="control-btn">Calendars</button>
+                        <button @click="logout" class="control-btn">Logout</button>
+                    </div>
+                </template>
+                
+                <template x-if="!isAuthenticated">
+                    <div class="login-container">
+                        <button @click="login" class="login-btn">Sign in with Google</button>
+                    </div>
+                </template>
+            </div>
+        </header>
+        
+        <main class="calendar-container">
+            <div class="canvas-container">
+                <canvas 
+                    id="calendar-canvas" 
+                    x-ref="canvas"
+                    @mousedown="startDrag"
+                    @mousemove="drag"
+                    @mouseup="endDrag"
+                    @mouseleave="endDrag"
+                    @wheel="handleZoom"
+                    @touchstart="handleTouchStart"
+                    @touchmove="handleTouchMove"
+                    @touchend="handleTouchEnd"
+                ></canvas>
+            </div>
+            
+            <div x-show="showCalendarList" class="calendar-list-panel">
+                <h2>Your Calendars</h2>
+                <div class="calendar-list">
+                    <template x-for="cal in calendars" :key="cal.id">
+                        <div class="calendar-item">
+                            <input 
+                                type="checkbox" 
+                                :id="cal.id" 
+                                :checked="cal.selected" 
+                                @change="toggleCalendar(cal.id)"
+                            >
+                            <label :for="cal.id" :style="{ color: cal.backgroundColor }">
+                                <span x-text="cal.summary"></span>
+                            </label>
+                        </div>
+                    </template>
+                </div>
+                <button @click="toggleCalendarList" class="close-btn">Close</button>
+            </div>
+            
+            <div x-show="selectedDay" class="events-panel">
+                <div class="events-header">
+                    <h2 x-text="formatSelectedDate"></h2>
+                    <button @click="closeEventsPanel" class="close-btn">×</button>
+                </div>
+                
+                <div class="events-list">
+                    <template x-if="selectedDayEvents.length === 0">
+                        <p class="no-events">No events for this day</p>
+                    </template>
+                    
+                    <template x-for="event in selectedDayEvents" :key="event.id">
+                        <div class="event-item" :style="{ borderLeftColor: getEventColor(event) }">
+                            <div class="event-header">
+                                <h3 x-text="event.summary"></h3>
+                                <span x-text="formatEventTime(event)"></span>
+                            </div>
+                            
+                            <div x-show="event.location" class="event-location">
+                                <span x-text="event.location"></span>
+                            </div>
+                            
+                            <div x-show="event.description" class="event-description">
+                                <p x-text="cleanDescription(event.description)"></p>
+                            </div>
+                            
+                            <div class="event-note">
+                                <label :for="'note-' + event.id">Note:</label>
+                                <textarea 
+                                    :id="'note-' + event.id" 
+                                    x-model="event.note" 
+                                    @blur="saveNote(event)"
+                                ></textarea>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/calendar-canvas.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

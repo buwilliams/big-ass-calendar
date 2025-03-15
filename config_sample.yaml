@@ -1,0 +1,17 @@
+# Sample configuration file for Big Ass Calendar
+# Rename this file to config.yaml and update with your settings
+
+# Flask Configuration
+flask:
+  secret_key: "your-secret-key-here"
+  debug: true
+
+# Google API Configuration
+google:
+  client_id: "your-client-id-here"
+  client_secret: "your-client-secret-here"
+
+# Application Settings
+app:
+  title: "The Big A$$ Calendar"
+  default_year: 2025  # Default year to display when opening the app
