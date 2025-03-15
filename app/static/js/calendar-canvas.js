@@ -75,10 +75,29 @@ class CalendarCanvas {
         this.drawGrid();
         this.drawMonthLabels();
         this.drawDayLabels();
+        this.drawCellHeaders();
         this.drawEvents();
         
         // Restore the context
         this.ctx.restore();
+    }
+    
+    drawCellHeaders() {
+        // Draw day headers for each cell in the grid
+        for (let month = 1; month <= 12; month++) {
+            for (let day = 1; day <= 31; day++) {
+                // Check if this is a valid date (e.g., February doesn't have 30 days)
+                const date = new Date(this.year, month - 1, day);
+                if (date.getMonth() !== month - 1) continue;
+                
+                // Calculate cell position
+                const x = this.gridX + this.columnWidth + ((day - 1) * this.columnWidth);
+                const y = this.gridY + this.rowHeight + ((month - 1) * this.rowHeight);
+                
+                // Draw the header
+                this.drawCellHeader(x, y, day, month);
+            }
+        }
     }
     
     drawGrid() {
@@ -166,6 +185,46 @@ class CalendarCanvas {
         });
     }
     
+    drawCellHeader(x, y, day, month) {
+        const dayOfWeek = new Date(this.year, month - 1, day).getDay();
+        const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        
+        // Format the day with ordinal suffix
+        const getOrdinalSuffix = (day) => {
+            if (day > 3 && day < 21) return 'th';
+            switch (day % 10) {
+                case 1: return 'st';
+                case 2: return 'nd';
+                case 3: return 'rd';
+                default: return 'th';
+            }
+        };
+        
+        const dayWithSuffix = `${day}${getOrdinalSuffix(day)}`;
+        const headerText = `${months[month-1]} ${weekdays[dayOfWeek]} ${dayWithSuffix}`;
+        
+        // Position for the header text
+        const headerX = x + (this.columnWidth / 2);
+        const headerY = y + (this.rowHeight * 0.15);
+        
+        // Draw the text
+        this.ctx.font = '9px Arial';
+        this.ctx.fillStyle = '#555';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText(headerText, headerX, headerY);
+        
+        // Draw the separator line
+        this.ctx.beginPath();
+        this.ctx.moveTo(x + 2, y + (this.rowHeight * 0.25));
+        this.ctx.lineTo(x + this.columnWidth - 2, y + (this.rowHeight * 0.25));
+        this.ctx.strokeStyle = '#ddd';
+        this.ctx.lineWidth = 1;
+        this.ctx.stroke();
+    }
+    
     drawEventIndicator(x, y, events) {
         // Sort events by calendar
         const eventsByCalendar = {};
@@ -185,9 +244,9 @@ class CalendarCanvas {
         });
         
         // Draw indicators for each calendar's events
-        const indicatorSize = Math.min(this.columnWidth, this.rowHeight) * 0.8;
+        const indicatorSize = Math.min(this.columnWidth, this.rowHeight) * 0.6; // Reduced size to make room for header
         const cellCenterX = x + (this.columnWidth / 2);
-        const cellCenterY = y + (this.rowHeight / 2);
+        const cellCenterY = y + (this.rowHeight * 0.6); // Move down to make room for header
         
         if (Object.keys(eventsByCalendar).length === 1) {
             // Single calendar: draw one colored circle
