@@ -1,14 +1,15 @@
 from flask import Flask
 from flask_cors import CORS
 import os
-from app.config import load_config
+from app.config import load_config, load_google_client
 
-def create_app(config_path=None):
+def create_app(config_path=None, google_client_path=None):
     """
     Create and configure the Flask application
     
     Args:
         config_path: Optional path to the config.yaml file
+        google_client_path: Optional path to the google_client.json file
         
     Returns:
         Configured Flask application
@@ -26,10 +27,6 @@ def create_app(config_path=None):
         )
         app.config["DEBUG"] = config.get("flask", {}).get("debug", False)
         
-        # Configure Google API settings
-        app.config["GOOGLE_CLIENT_ID"] = config.get("google", {}).get("client_id")
-        app.config["GOOGLE_CLIENT_SECRET"] = config.get("google", {}).get("client_secret")
-        
         # Configure app settings
         app.config["APP_TITLE"] = config.get("app", {}).get("title", "The Big A$$ Calendar")
         app.config["DEFAULT_YEAR"] = config.get("app", {}).get("default_year", 2025)
@@ -43,6 +40,33 @@ def create_app(config_path=None):
         app.config["DEBUG"] = True
         app.config["APP_TITLE"] = "The Big A$$ Calendar"
         app.config["DEFAULT_YEAR"] = 2025
+    
+    # Load Google client configuration
+    google_client_config, from_file = load_google_client(google_client_path)
+    
+    if from_file:
+        app.logger.info("Using Google client configuration from google_client.json")
+        app.config["GOOGLE_CLIENT_CONFIG"] = google_client_config
+        
+        # For backwards compatibility, also set individual keys
+        if "web" in google_client_config:
+            app.config["GOOGLE_CLIENT_ID"] = google_client_config["web"].get("client_id")
+            app.config["GOOGLE_CLIENT_SECRET"] = google_client_config["web"].get("client_secret")
+    else:
+        app.logger.info("Google client JSON file not found, using config from YAML")
+        # Use Google config from YAML if JSON file wasn't found
+        app.config["GOOGLE_CLIENT_ID"] = config.get("google", {}).get("client_id")
+        app.config["GOOGLE_CLIENT_SECRET"] = config.get("google", {}).get("client_secret")
+        
+        # Create a minimal client config for auth routes
+        app.config["GOOGLE_CLIENT_CONFIG"] = {
+            "web": {
+                "client_id": app.config["GOOGLE_CLIENT_ID"],
+                "client_secret": app.config["GOOGLE_CLIENT_SECRET"],
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token"
+            }
+        }
     
     # Register blueprints
     from app.routes.auth import auth_bp

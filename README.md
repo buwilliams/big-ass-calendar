@@ -53,7 +53,18 @@ python run.py --config=/path/to/custom/config.yaml
 5. Add authorized redirect URIs:
    - `http://localhost:5000/oauth2callback` (for development)
    - Your production callback URL when deployed
-6. Copy the Client ID and Client Secret to your .env file
+6. Download the client credentials JSON file by clicking the "Download JSON" button
+7. Save the file as `google_client.json` in the project root directory
+
+Alternatively, you can add the credentials to your `config.yaml` file:
+
+```yaml
+google:
+  client_id: "your-client-id-here"
+  client_secret: "your-client-secret-here"
+```
+
+The application will prefer the `google_client.json` file if it exists.
 
 ## Usage
 

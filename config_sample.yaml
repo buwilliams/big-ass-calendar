@@ -6,7 +6,8 @@ flask:
   secret_key: "your-secret-key-here"
   debug: true
 
-# Google API Configuration
+# Google API Configuration (used if google_client.json is not found)
+# It's recommended to use google_client.json instead of this configuration
 google:
   client_id: "your-client-id-here"
   client_secret: "your-client-secret-here"

@@ -1,6 +1,7 @@
 import pytest
 import os
 import yaml
+import json
 import tempfile
 from app import create_app
 from flask import session
@@ -32,13 +33,63 @@ def test_config():
     os.unlink(config_path)
 
 @pytest.fixture
-def app(test_config):
+def test_google_client():
+    """Create a temporary Google client JSON file"""
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        client_config = {
+            "web": {
+                "client_id": "test-json-client-id",
+                "project_id": "test-project",
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                "client_secret": "test-json-client-secret",
+                "redirect_uris": ["http://localhost:5000/oauth2callback"],
+                "javascript_origins": ["http://localhost:5000"]
+            }
+        }
+        json.dump(client_config, f)
+        client_path = f.name
+    
+    yield client_path
+    
+    # Clean up the temporary file
+    os.unlink(client_path)
+
+@pytest.fixture
+def app_with_yaml_config(test_config):
+    """Create app with YAML config only"""
     app = create_app(test_config)
     app.config.update({
         "TESTING": True,
     })
     
     yield app
+    
+@pytest.fixture
+def app_with_json_config(test_google_client):
+    """Create app with Google JSON config only"""
+    app = create_app(None, test_google_client)
+    app.config.update({
+        "TESTING": True,
+    })
+    
+    yield app
+
+@pytest.fixture
+def app_with_both_configs(test_config, test_google_client):
+    """Create app with both configs"""
+    app = create_app(test_config, test_google_client)
+    app.config.update({
+        "TESTING": True,
+    })
+    
+    yield app
+
+@pytest.fixture
+def app(app_with_both_configs):
+    """Default app fixture uses both configs"""
+    return app_with_both_configs
 
 @pytest.fixture
 def client(app):
@@ -56,6 +107,19 @@ def test_app_config(client):
     assert "defaultYear" in data
     assert data["title"] == "Test Calendar"
     assert data["defaultYear"] == 2025
+
+def test_client_config_precedence(app_with_both_configs):
+    # Test that the JSON client config takes precedence over YAML config
+    assert app_with_both_configs.config["GOOGLE_CLIENT_ID"] == "test-json-client-id"
+    assert app_with_both_configs.config["GOOGLE_CLIENT_SECRET"] == "test-json-client-secret"
+    assert "GOOGLE_CLIENT_CONFIG" in app_with_both_configs.config
+    assert app_with_both_configs.config["GOOGLE_CLIENT_CONFIG"]["web"]["client_id"] == "test-json-client-id"
+
+def test_yaml_config_fallback(app_with_yaml_config):
+    # Test that YAML config is used when JSON is not available
+    assert app_with_yaml_config.config["GOOGLE_CLIENT_ID"] == "test-client-id"
+    assert app_with_yaml_config.config["GOOGLE_CLIENT_SECRET"] == "test-client-secret"
+    assert "GOOGLE_CLIENT_CONFIG" in app_with_yaml_config.config
     
 def test_check_auth_unauthenticated(client):
     response = client.get("/check-auth")

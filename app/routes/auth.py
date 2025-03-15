@@ -3,6 +3,7 @@ import google.oauth2.credentials
 import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
 import os
+import copy
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -14,16 +15,15 @@ SCOPES = [
 
 @auth_bp.route("/login")
 def login():
+    # Get a copy of the client config and add dynamic redirect URI
+    client_config = copy.deepcopy(current_app.config["GOOGLE_CLIENT_CONFIG"])
+    
+    # Ensure the redirect URI is set correctly (dynamically based on current request)
+    if "web" in client_config:
+        client_config["web"]["redirect_uris"] = [url_for("auth.oauth2callback", _external=True)]
+    
     flow = google_auth_oauthlib.flow.Flow.from_client_config(
-        {
-            "web": {
-                "client_id": current_app.config["GOOGLE_CLIENT_ID"],
-                "client_secret": current_app.config["GOOGLE_CLIENT_SECRET"],
-                "redirect_uris": [url_for("auth.oauth2callback", _external=True)],
-                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                "token_uri": "https://oauth2.googleapis.com/token",
-            }
-        },
+        client_config,
         SCOPES
     )
     
@@ -43,16 +43,15 @@ def oauth2callback():
     if not state or state != request.args.get("state"):
         return jsonify({"error": "State mismatch"}), 400
     
+    # Get a copy of the client config and add dynamic redirect URI
+    client_config = copy.deepcopy(current_app.config["GOOGLE_CLIENT_CONFIG"])
+    
+    # Ensure the redirect URI is set correctly (dynamically based on current request)
+    if "web" in client_config:
+        client_config["web"]["redirect_uris"] = [url_for("auth.oauth2callback", _external=True)]
+    
     flow = google_auth_oauthlib.flow.Flow.from_client_config(
-        {
-            "web": {
-                "client_id": current_app.config["GOOGLE_CLIENT_ID"],
-                "client_secret": current_app.config["GOOGLE_CLIENT_SECRET"],
-                "redirect_uris": [url_for("auth.oauth2callback", _external=True)],
-                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                "token_uri": "https://oauth2.googleapis.com/token",
-            }
-        },
+        client_config,
         SCOPES,
         state=state
     )

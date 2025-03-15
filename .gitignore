@@ -28,6 +28,7 @@ instance/
 
 # Configuration
 config.yaml
+google_client.json
 
 # Unit test / coverage reports
 htmlcov/
