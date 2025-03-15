@@ -19,14 +19,7 @@ A web application that displays an entire year's schedule in a single view. The 
 
 ### Local Development
 
-This project includes a simplified version of Alpine.js for local development. For production use, download the complete library:
-
-```bash
-# From the project root
-curl -o app/static/js/vendor/alpine.min.js https://unpkg.com/alpinejs@3.13.3/dist/cdn.min.js
-```
-
-The application is configured to use the local file and fall back to the CDN if necessary.
+The project includes Alpine.js for local development with a CDN fallback if necessary.
 
 ## Setup and Installation
 
