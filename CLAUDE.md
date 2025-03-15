@@ -1,6 +1,7 @@
 # Big Ass Calendar Developer Guide
 
 ## Commands
+- Quick Start: `./run.sh` (sets up venv, installs deps, runs app)
 - Setup: `pip install -r requirements.txt`
 - Config: `cp config_sample.yaml config.yaml && nano config.yaml`
 - Google credentials: `cp google_client_sample.json google_client.json && nano google_client.json`

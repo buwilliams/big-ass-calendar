@@ -19,6 +19,26 @@ A web application that displays an entire year's schedule in a single view. The 
 
 ## Setup and Installation
 
+### Quick Start (Linux/Mac)
+
+Use the included shell script to automatically set up and run the application:
+
+```bash
+# Make the script executable (first time only)
+chmod +x run.sh
+
+# Run the application
+./run.sh
+```
+
+The script will:
+1. Create a virtual environment if it doesn't exist
+2. Install all dependencies
+3. Create config files from samples if they don't exist
+4. Run the application with the correct parameters
+
+### Manual Setup
+
 1. Clone this repository
 2. Create a virtual environment:
    ```
@@ -29,19 +49,31 @@ A web application that displays an entire year's schedule in a single view. The 
    ```
    pip install -r requirements.txt
    ```
-4. Create a `config.yaml` file based on `config_sample.yaml` and add your Google API credentials:
+4. Create a `config.yaml` file based on `config_sample.yaml`:
    ```
    cp config_sample.yaml config.yaml
    # Edit config.yaml with your settings
    ```
-5. Run the application:
+5. Create a `google_client.json` file based on the sample or download it from Google Cloud Console:
+   ```
+   cp google_client_sample.json google_client.json
+   # Edit google_client.json with your credentials
+   ```
+6. Run the application:
    ```
    python run.py
    ```
 
-You can also specify a custom config file location:
+### Advanced Usage
+
+You can specify custom file locations:
 ```
-python run.py --config=/path/to/custom/config.yaml
+python run.py --config=/path/to/custom/config.yaml --google-client=/path/to/credentials.json
+```
+
+For more information about available options:
+```
+python run.py --info
 ```
 
 ## Google API Setup
